@@ -1,5 +1,5 @@
 import express from 'express';
-import OpenAI from 'openai';
+import Anthropic from '@anthropic-ai/sdk';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import path from 'path';
@@ -10,8 +10,10 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 dotenv.config();
 
 // Bright Data MCP expects API_TOKEN — map from our named var at startup
-if (process.env.BRIGHTDATA_API_TOKEN) {
-  process.env.API_TOKEN = process.env.BRIGHTDATA_API_TOKEN;
+const bdToken = process.env.BRIGHTDATA_API_TOKEN || process.env.BRIGHT_DATA_API_TOKEN;
+if (bdToken) {
+  process.env.API_TOKEN = bdToken;
+  process.env.BRIGHTDATA_API_TOKEN = bdToken;
 }
 
 const __filename = fileURLToPath(import.meta.url);
@@ -24,9 +26,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const client = new OpenAI({
+const anthropic = new Anthropic({
   apiKey: process.env.MINIMAX_API_KEY,
-  baseURL: 'https://api.minimax.io/v1',
 });
 
 // ── Bright Data MCP client ─────────────────────────────────────────────────────
@@ -295,19 +296,18 @@ app.post('/api/research', async (req, res) => {
     ? `Perform a comprehensive Amazon market research analysis for: ${product.trim()}\n\nUse the following real-time Amazon marketplace data:\n\n${amazonData}`
     : `Perform a comprehensive Amazon market research analysis for: ${product.trim()}`;
 
-  // Step 3 — call Minimax to synthesise the structured report
+  // Step 3 — call Claude to synthesise the structured report
   try {
-    const message = await client.chat.completions.create({
-      model: 'MiniMax-M2.5',
+    const message = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514',
       max_tokens: 4096,
-      response_format: { type: 'json_object' },
+      system: SYSTEM_PROMPT,
       messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        { role: 'user',   content: userContent },
+        { role: 'user', content: userContent },
       ],
     });
 
-    const raw = message.choices[0].message.content.trim();
+    const raw = message.content[0].text.trim();
 
     // Three-stage JSON extraction fallback
     let data;
@@ -323,7 +323,7 @@ app.post('/api/research', async (req, res) => {
     }
 
     if (!data) {
-      console.error('Raw Minimax response:', raw);
+      console.error('Raw Claude response:', raw);
       return res.status(500).json({ error: 'Failed to parse AI response as JSON.', raw });
     }
 
@@ -331,7 +331,7 @@ app.post('/api/research', async (req, res) => {
 
     res.json(data);
   } catch (err) {
-    console.error('Minimax API error:', err);
+    console.error('Claude API error:', err);
     res.status(500).json({ error: err.message || 'Internal server error.' });
   }
 });

@@ -18,7 +18,7 @@ function exportJSON() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `market-research-${Date.now()}.json`;
+  a.download = `argus-report-${Date.now()}.json`;
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -34,49 +34,36 @@ function hideError() {
 }
 
 function badge(level, text) {
-  const map = {
-    high:     'background:#fee2e2;color:#b91c1c',
-    medium:   'background:#fef3c7;color:#92400e',
-    low:      'background:#d1fae5;color:#065f46',
-    emerging: 'background:#dbeafe;color:#1e40af',
-    growing:  'background:#d1fae5;color:#065f46',
-    mature:   'background:#f1f5f9;color:#475569',
-    declining:'background:#fee2e2;color:#b91c1c',
-  };
-  const style = map[(level || '').toLowerCase()] || 'background:#f3f4f6;color:#374151';
-  return `<span style="${style};display:inline-flex;align-items:center;padding:2px 10px;border-radius:9999px;font-size:0.75rem;font-weight:600;">${escHtml(text || level)}</span>`;
+  const cls = `badge badge-${(level || '').toLowerCase()}`;
+  return `<span class="${cls}">${escHtml(text || level)}</span>`;
 }
 
-function pill(text, bgColor = '#eff6ff', textColor = '#1d4ed8') {
-  return `<span style="display:inline-block;font-size:0.75rem;font-weight:500;padding:2px 8px;border-radius:6px;background:${bgColor};color:${textColor};">${escHtml(text)}</span>`;
+function pill(text) {
+  return `<span class="pill">${escHtml(text)}</span>`;
 }
 
 function escHtml(s) {
   return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-function ul(items, checkColor = '#6366f1') {
-  if (!Array.isArray(items) || !items.length) return '<p style="font-size:0.875rem;color:#9ca3af;font-style:italic;">None listed.</p>';
-  return `<ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:4px;">
-    ${items.map(i => `
-      <li style="display:flex;align-items:flex-start;gap:8px;font-size:0.875rem;color:#374151;">
-        <svg style="width:14px;height:14px;margin-top:2px;flex-shrink:0;color:${checkColor}" fill="none" stroke="${checkColor}" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-        </svg>
-        <span>${escHtml(i)}</span>
-      </li>`).join('')}
-  </ul>`;
+function checkIcon(color) {
+  return `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>`;
+}
+
+function ul(items, color = 'var(--accent)') {
+  if (!Array.isArray(items) || !items.length) return '<p style="font-size:0.8rem;color:var(--text-muted);font-style:italic;">None listed.</p>';
+  return `<ul class="check-list">${items.map(i => `<li>${checkIcon(color)}<span>${escHtml(i)}</span></li>`).join('')}</ul>`;
 }
 
 function sectionTitle(title, subtitle = '') {
   return `<div style="margin-bottom:1.5rem;">
-    <h3 style="font-size:1.25rem;font-weight:700;color:#111827;margin:0 0 4px 0;">${escHtml(title)}</h3>
-    ${subtitle ? `<p style="font-size:0.875rem;color:#6b7280;margin:0;">${escHtml(subtitle)}</p>` : ''}
+    <h3 class="section-title">${escHtml(title)}</h3>
+    ${subtitle ? `<p class="section-subtitle">${escHtml(subtitle)}</p>` : ''}
   </div>`;
 }
 
-function card(content, extraStyle = '') {
-  return `<div style="background:white;border:1px solid #e5e7eb;border-radius:16px;padding:24px;transition:transform 0.2s,box-shadow 0.2s;${extraStyle}">${content}</div>`;
+function card(content) {
+  return `<div class="content-card">${content}</div>`;
 }
 
 // ── Tab switching ──────────────────────────────────────────────────────────────
@@ -90,7 +77,7 @@ function switchTab(name) {
   if (btn)   btn.classList.add('active');
 }
 
-// ── Normalise keys (handles snake_case or camelCase from model) ───────────────
+// ── Normalise keys ────────────────────────────────────────────────────────────
 
 function normalise(data) {
   const get = (obj, ...keys) => { for (const k of keys) if (obj?.[k] !== undefined) return obj[k]; return undefined; };
@@ -121,12 +108,12 @@ async function runResearch() {
   loading.classList.remove('hidden');
 
   const steps = [
-    ['Searching Amazon...', 'Finding competing products in the marketplace'],
-    ['Fetching product details...', 'Gathering pricing, ratings & features'],
-    ['Reading customer reviews...', 'Identifying pain points and sentiment'],
-    ['Finding market opportunities...', 'Spotting gaps and underserved niches'],
-    ['Building strategic insights...', 'Synthesizing competitive intelligence'],
-    ['Finalizing report...', 'Almost done'],
+    ['Scanning Amazon marketplace...', 'Finding competing products'],
+    ['Extracting product data...', 'Gathering pricing, ratings & features'],
+    ['Analyzing customer reviews...', 'Identifying pain points and sentiment'],
+    ['Mapping opportunities...', 'Spotting gaps and underserved niches'],
+    ['Synthesizing intelligence...', 'Building competitive analysis'],
+    ['Compiling report...', 'Almost done'],
   ];
   let step = 0;
   const bar = document.getElementById('progressBar');
@@ -163,12 +150,10 @@ async function runResearch() {
     await new Promise(r => setTimeout(r, 400));
     loading.classList.add('hidden');
 
-    // Show section FIRST so Tailwind CDN can process dynamic classes
     const section = document.getElementById('reportSection');
     section.classList.remove('hidden');
 
     renderReport(data);
-
     section.scrollIntoView({ behavior: 'smooth' });
 
   } catch (err) {
@@ -187,10 +172,9 @@ async function runResearch() {
 function renderReport(data) {
   document.getElementById('reportTitle').textContent = data.product || 'Market Analysis';
 
-  const dateStr = `Generated on ${new Date(data.analysisDate || Date.now()).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' })}`;
+  const dateStr = new Date(data.analysisDate || Date.now()).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
   const webBadge = data._amazonDataUsed
-    ? ` &nbsp;<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.7rem;font-weight:600;background:#fff7ed;color:#c2410c;padding:2px 8px;border-radius:9999px;vertical-align:middle;border:1px solid #fed7aa;">` +
-      `<span style="font-size:0.65rem;">📦</span>Live Amazon Data</span>`
+    ? ` <span class="amazon-badge">LIVE DATA</span>`
     : '';
   document.getElementById('reportDate').innerHTML = escHtml(dateStr) + webBadge;
 
@@ -210,32 +194,30 @@ function renderReport(data) {
 function renderOverviewCards(overview, competitorCount) {
   const mo = overview || {};
   const cards = [
-    { label: 'Market Size',       value: mo.marketSize   || mo.market_size   || '—', icon: '💰', bg: '#eff6ff', border: '#bfdbfe' },
-    { label: 'Growth Rate',       value: mo.growthRate   || mo.growth_rate   || '—', icon: '📈', bg: '#f0fdf4', border: '#bbf7d0' },
-    { label: 'Maturity Stage',    value: mo.maturityStage|| mo.maturity_stage|| '—', icon: '🎯', bg: '#f5f3ff', border: '#ddd6fe' },
-    { label: 'Competitors Found', value: String(competitorCount),                    icon: '🏢', bg: '#fffbeb', border: '#fde68a' },
+    { label: 'Market Size',       value: mo.marketSize   || mo.market_size   || '—', icon: '💰' },
+    { label: 'Growth Rate',       value: mo.growthRate   || mo.growth_rate   || '—', icon: '📈' },
+    { label: 'Maturity Stage',    value: mo.maturityStage|| mo.maturity_stage|| '—', icon: '🎯' },
+    { label: 'Competitors Found', value: String(competitorCount),                    icon: '🏢' },
   ];
 
   document.getElementById('overviewCards').innerHTML = cards.map(c => `
-    <div style="background:linear-gradient(135deg,${c.bg},white);border:1px solid ${c.border};border-radius:16px;padding:20px;transition:transform 0.2s,box-shadow 0.2s;">
-      <div style="font-size:1.5rem;margin-bottom:8px;">${c.icon}</div>
-      <p style="font-size:0.7rem;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 4px 0;">${c.label}</p>
-      <p style="font-size:1rem;font-weight:700;color:#1f2937;margin:0;text-transform:capitalize;">${escHtml(c.value)}</p>
+    <div class="stat-card">
+      <div class="stat-icon">${c.icon}</div>
+      <p class="stat-label mono">${c.label}</p>
+      <p class="stat-value">${escHtml(c.value)}</p>
     </div>
   `).join('');
 
   const summary = mo.summary;
-  const existing = document.getElementById('overviewSummary');
-  if (existing) existing.remove();
+  const wrap = document.getElementById('overviewSummaryWrap');
   if (summary) {
-    const div = document.createElement('div');
-    div.id = 'overviewSummary';
-    div.style.cssText = 'background:white;border:1px solid #e5e7eb;border-radius:16px;padding:24px;margin-bottom:2rem;';
-    div.innerHTML = `
-      <p style="font-size:0.7rem;font-weight:600;color:#4f46e5;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px 0;">Market Overview</p>
-      <p style="font-size:0.9375rem;color:#374151;line-height:1.7;margin:0;">${escHtml(summary)}</p>
-    `;
-    document.getElementById('overviewCards').after(div);
+    wrap.innerHTML = `
+      <div class="content-card" style="margin-bottom:2rem;">
+        <p class="mono" style="font-size:0.65rem;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem;">Market Overview</p>
+        <p style="font-size:0.875rem;color:var(--text-secondary);line-height:1.7;">${escHtml(summary)}</p>
+      </div>`;
+  } else {
+    wrap.innerHTML = '';
   }
 }
 
@@ -246,42 +228,41 @@ function renderCompetitors(competitors) {
   if (!competitors?.length) { el.innerHTML = empty('No competitor data available.'); return; }
 
   el.innerHTML = sectionTitle('Competitive Landscape', `${competitors.length} key competitors identified`) +
-    `<div style="display:flex;flex-direction:column;gap:20px;">` +
+    `<div style="display:flex;flex-direction:column;gap:1rem;">` +
     competitors.map(c => card(`
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px;flex-wrap:wrap;">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#e0e7ff,#ede9fe);display:flex;align-items:center;justify-content:center;font-weight:700;color:#4338ca;font-size:1.125rem;flex-shrink:0;">
-            ${escHtml((c.name || '?')[0].toUpperCase())}
-          </div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:1rem;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <div class="avatar">${escHtml((c.name || '?')[0].toUpperCase())}</div>
           <div>
-            <h4 style="font-weight:700;color:#111827;margin:0 0 2px 0;">${escHtml(c.name || 'Unknown')}</h4>
-            <p style="font-size:0.75rem;color:#6b7280;margin:0;">${escHtml(c.targetSegment || c.target_segment || '')}</p>
+            <h4 style="font-weight:700;color:var(--text-primary);margin:0 0 2px 0;">${escHtml(c.name || 'Unknown')}</h4>
+            <p class="mono" style="font-size:0.7rem;color:var(--text-muted);margin:0;">${escHtml(c.targetSegment || c.target_segment || '')}</p>
           </div>
         </div>
         <div style="text-align:right;">
-          <p style="font-size:0.7rem;color:#9ca3af;font-weight:500;text-transform:uppercase;margin:0 0 2px 0;">Pricing</p>
-          <p style="font-size:0.875rem;font-weight:600;color:#374151;margin:0;">${escHtml(c.pricingModel || c.pricing_model || '—')}</p>
+          <p class="mono" style="font-size:0.6rem;color:var(--text-muted);text-transform:uppercase;margin:0 0 2px 0;">Pricing</p>
+          <p style="font-size:0.8rem;font-weight:600;color:var(--text-secondary);margin:0;">${escHtml(c.pricingModel || c.pricing_model || '—')}</p>
         </div>
       </div>
 
-      <p style="font-size:0.875rem;color:#4b5563;margin:0 0 16px 0;">${escHtml(c.positioning || '')}</p>
+      <p style="font-size:0.8rem;color:var(--text-secondary);margin:0 0 1rem 0;">${escHtml(c.positioning || '')}</p>
 
       ${(c.keyFeatures || c.key_features)?.length ? `
-        <div style="margin-bottom:16px;">
-          <p style="font-size:0.7rem;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px 0;">Key Features</p>
-          <div style="display:flex;flex-wrap:wrap;gap:6px;">
-            ${(c.keyFeatures || c.key_features).map(f => pill(f, '#eff6ff', '#1d4ed8')).join('')}
+        <div style="margin-bottom:1rem;">
+          <p class="mono" style="font-size:0.6rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin:0 0 0.5rem 0;">Key Features</p>
+          <div style="display:flex;flex-wrap:wrap;gap:0.375rem;">
+            ${(c.keyFeatures || c.key_features).map(f => pill(f)).join('')}
           </div>
         </div>` : ''}
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;padding-top:12px;border-top:1px solid #f3f4f6;">
+      <div class="divider"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
         <div>
-          <p style="font-size:0.7rem;font-weight:600;color:#059669;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px 0;">Strengths</p>
-          ${ul(c.strengths, '#059669')}
+          <p class="mono" style="font-size:0.6rem;font-weight:600;color:var(--success);text-transform:uppercase;letter-spacing:0.08em;margin:0 0 0.5rem 0;">Strengths</p>
+          ${ul(c.strengths, 'var(--success)')}
         </div>
         <div>
-          <p style="font-size:0.7rem;font-weight:600;color:#dc2626;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px 0;">Weaknesses</p>
-          ${ul(c.weaknesses, '#dc2626')}
+          <p class="mono" style="font-size:0.6rem;font-weight:600;color:var(--error);text-transform:uppercase;letter-spacing:0.08em;margin:0 0 0.5rem 0;">Weaknesses</p>
+          ${ul(c.weaknesses, 'var(--error)')}
         </div>
       </div>
     `)).join('') + `</div>`;
@@ -294,29 +275,25 @@ function renderSegments(segments) {
   if (!segments?.length) { el.innerHTML = empty('No segment data available.'); return; }
 
   el.innerHTML = sectionTitle('Target Market Segments', 'Primary audiences and their needs') +
-    `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;">` +
+    `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;">` +
     segments.map(s => card(`
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-        <div style="width:32px;height:32px;border-radius:10px;background:#fef3c7;color:#92400e;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.875rem;flex-shrink:0;">
-          ${escHtml((s.segment || '?')[0].toUpperCase())}
-        </div>
-        <h4 style="font-weight:700;color:#111827;margin:0;">${escHtml(s.segment || 'Segment')}</h4>
+      <div style="display:flex;align-items:center;gap:0.625rem;margin-bottom:0.75rem;">
+        <div class="avatar" style="font-size:0.75rem;">${escHtml((s.segment || '?')[0].toUpperCase())}</div>
+        <h4 style="font-weight:700;color:var(--text-primary);margin:0;">${escHtml(s.segment || 'Segment')}</h4>
       </div>
-      <p style="font-size:0.875rem;color:#4b5563;margin:0 0 16px 0;">${escHtml(s.description || '')}</p>
+      <p style="font-size:0.8rem;color:var(--text-secondary);margin:0 0 1rem 0;">${escHtml(s.description || '')}</p>
       ${(s.painPoints || s.pain_points)?.length ? `
-        <div style="margin-bottom:12px;">
-          <p style="font-size:0.7rem;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px 0;">Pain Points</p>
-          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:4px;">
-            ${(s.painPoints || s.pain_points).map(p => `
-              <li style="display:flex;align-items:flex-start;gap:8px;font-size:0.875rem;color:#374151;">
-                <span style="color:#f59e0b;margin-top:1px;">⚡</span>${escHtml(p)}
-              </li>`).join('')}
+        <div style="margin-bottom:0.75rem;">
+          <p class="mono" style="font-size:0.6rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin:0 0 0.5rem 0;">Pain Points</p>
+          <ul class="check-list">
+            ${(s.painPoints || s.pain_points).map(p => `<li><span style="color:var(--warning);">⚡</span><span>${escHtml(p)}</span></li>`).join('')}
           </ul>
         </div>` : ''}
       ${s.willingnessToPay || s.willingness_to_pay ? `
-        <div style="margin-top:12px;padding-top:12px;border-top:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between;">
-          <p style="font-size:0.75rem;color:#6b7280;font-weight:500;margin:0;">Willingness to Pay</p>
-          <p style="font-size:0.875rem;font-weight:600;color:#111827;margin:0;">${escHtml(s.willingnessToPay || s.willingness_to_pay)}</p>
+        <div class="divider"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span class="mono" style="font-size:0.65rem;color:var(--text-muted);">Willingness to Pay</span>
+          <span style="font-size:0.8rem;font-weight:600;color:var(--text-primary);">${escHtml(s.willingnessToPay || s.willingness_to_pay)}</span>
         </div>` : ''}
     `)).join('') + `</div>`;
 }
@@ -327,24 +304,21 @@ function renderTrends(trends) {
   const el = document.getElementById('tab-trends');
   if (!trends?.length) { el.innerHTML = empty('No trend data available.'); return; }
 
-  const impactBg = { high: '#fee2e2', medium: '#fef3c7', low: '#d1fae5' };
   const impactIcon = { high: '🔥', medium: '📊', low: '💡' };
 
   el.innerHTML = sectionTitle('Market Trends', 'Forces shaping the competitive landscape') +
-    `<div style="display:flex;flex-direction:column;gap:16px;">` +
+    `<div style="display:flex;flex-direction:column;gap:0.75rem;">` +
     trends.map(t => {
       const imp = (t.impact || '').toLowerCase();
       return card(`
-        <div style="display:flex;gap:16px;align-items:flex-start;">
-          <div style="flex-shrink:0;width:40px;height:40px;border-radius:12px;background:${impactBg[imp] || '#f3f4f6'};display:flex;align-items:center;justify-content:center;font-size:1.125rem;">
-            ${impactIcon[imp] || '📌'}
-          </div>
+        <div style="display:flex;gap:1rem;align-items:flex-start;">
+          <div class="avatar" style="font-size:1rem;">${impactIcon[imp] || '📌'}</div>
           <div style="flex:1;">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
-              <h4 style="font-weight:700;color:#111827;margin:0;">${escHtml(t.trend || '')}</h4>
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.375rem;flex-wrap:wrap;">
+              <h4 style="font-weight:700;color:var(--text-primary);margin:0;">${escHtml(t.trend || '')}</h4>
               ${badge(t.impact, `${cap(t.impact)} Impact`)}
             </div>
-            <p style="font-size:0.875rem;color:#4b5563;margin:0;">${escHtml(t.description || '')}</p>
+            <p style="font-size:0.8rem;color:var(--text-secondary);margin:0;">${escHtml(t.description || '')}</p>
           </div>
         </div>
       `);
@@ -358,16 +332,16 @@ function renderGaps(gaps) {
   if (!gaps?.length) { el.innerHTML = empty('No opportunity data available.'); return; }
 
   el.innerHTML = sectionTitle('Opportunity Gaps', 'Underserved needs and white spaces') +
-    `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;">` +
+    `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;">` +
     gaps.map((g, i) => card(`
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;flex-wrap:wrap;">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span style="width:24px;height:24px;border-radius:50%;background:#e0e7ff;color:#4338ca;font-size:0.75rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;">${i+1}</span>
-          <h4 style="font-weight:700;color:#111827;margin:0;">${escHtml(g.gap || '')}</h4>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;gap:0.5rem;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <div class="avatar" style="width:1.5rem;height:1.5rem;font-size:0.7rem;border-radius:50%;">${i+1}</div>
+          <h4 style="font-weight:700;color:var(--text-primary);margin:0;">${escHtml(g.gap || '')}</h4>
         </div>
         ${badge(g.difficulty, `${cap(g.difficulty)} Difficulty`)}
       </div>
-      <p style="font-size:0.875rem;color:#4b5563;margin:0;">${escHtml(g.rationale || '')}</p>
+      <p style="font-size:0.8rem;color:var(--text-secondary);margin:0;">${escHtml(g.rationale || '')}</p>
     `)).join('') + `</div>`;
 }
 
@@ -378,20 +352,17 @@ function renderSwot(swot) {
   if (!swot) { el.innerHTML = empty('No SWOT data available.'); return; }
 
   const quadrants = [
-    { key: 'strengths',     label: 'Strengths',     icon: '💪', bg: '#f0fdf4', border: '#bbf7d0', head: '#065f46', check: '#059669' },
-    { key: 'weaknesses',    label: 'Weaknesses',    icon: '⚠️', bg: '#fef2f2', border: '#fecaca', head: '#991b1b', check: '#dc2626' },
-    { key: 'opportunities', label: 'Opportunities', icon: '🚀', bg: '#eff6ff', border: '#bfdbfe', head: '#1e3a8a', check: '#2563eb' },
-    { key: 'threats',       label: 'Threats',       icon: '🛡️', bg: '#fffbeb', border: '#fde68a', head: '#78350f', check: '#d97706' },
+    { key: 'strengths',     label: 'Strengths',     icon: '💪', bg: 'rgba(52,211,153,0.06)', border: 'rgba(52,211,153,0.15)', head: 'var(--success)', check: 'var(--success)' },
+    { key: 'weaknesses',    label: 'Weaknesses',    icon: '⚠️', bg: 'rgba(248,113,113,0.06)', border: 'rgba(248,113,113,0.15)', head: 'var(--error)', check: 'var(--error)' },
+    { key: 'opportunities', label: 'Opportunities', icon: '🚀', bg: 'rgba(96,165,250,0.06)', border: 'rgba(96,165,250,0.15)', head: '#60a5fa', check: '#60a5fa' },
+    { key: 'threats',       label: 'Threats',       icon: '🛡️', bg: 'rgba(251,191,36,0.06)', border: 'rgba(251,191,36,0.15)', head: 'var(--warning)', check: 'var(--warning)' },
   ];
 
   el.innerHTML = sectionTitle('SWOT Analysis', 'Strategic position assessment') +
-    `<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">` +
+    `<div class="swot-grid">` +
     quadrants.map(q => `
-      <div style="background:${q.bg};border:1px solid ${q.border};border-radius:16px;padding:20px;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
-          <span style="font-size:1.25rem;">${q.icon}</span>
-          <h4 style="font-weight:700;color:${q.head};text-transform:uppercase;letter-spacing:0.05em;font-size:0.8125rem;margin:0;">${q.label}</h4>
-        </div>
+      <div class="swot-quad" style="background:${q.bg};border:1px solid ${q.border};">
+        <h4 style="color:${q.head};">${q.icon} ${q.label}</h4>
         ${ul(swot[q.key], q.check)}
       </div>`).join('') + `</div>`;
 }
@@ -407,24 +378,18 @@ function renderStrategy(recs) {
     (order[(a.priority||'').toLowerCase()] ?? 3) - (order[(b.priority||'').toLowerCase()] ?? 3)
   );
 
-  const numBg = { high: '#fee2e2', medium: '#fef3c7', low: '#d1fae5' };
-  const numTxt = { high: '#b91c1c', medium: '#92400e', low: '#065f46' };
-
   el.innerHTML = sectionTitle('Strategic Recommendations', 'Prioritized action plan based on market analysis') +
-    `<div style="display:flex;flex-direction:column;gap:16px;">` +
+    `<div style="display:flex;flex-direction:column;gap:0.75rem;">` +
     sorted.map((r, i) => {
-      const p = (r.priority || '').toLowerCase();
       return card(`
-        <div style="display:flex;gap:16px;">
-          <div style="flex-shrink:0;width:40px;height:40px;border-radius:12px;background:${numBg[p]||'#f3f4f6'};color:${numTxt[p]||'#374151'};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;">
-            ${i + 1}
-          </div>
+        <div style="display:flex;gap:1rem;">
+          <div class="avatar">${i + 1}</div>
           <div style="flex:1;">
-            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px;flex-wrap:wrap;">
-              <h4 style="font-weight:700;color:#111827;margin:0;">${escHtml(r.recommendation || '')}</h4>
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.75rem;margin-bottom:0.5rem;flex-wrap:wrap;">
+              <h4 style="font-weight:700;color:var(--text-primary);margin:0;">${escHtml(r.recommendation || '')}</h4>
               ${badge(r.priority, `${cap(r.priority)} Priority`)}
             </div>
-            <p style="font-size:0.875rem;color:#4b5563;margin:0;">${escHtml(r.rationale || '')}</p>
+            <p style="font-size:0.8rem;color:var(--text-secondary);margin:0;">${escHtml(r.rationale || '')}</p>
           </div>
         </div>
       `);
@@ -436,7 +401,7 @@ function renderStrategy(recs) {
 function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
 
 function empty(msg) {
-  return `<p style="color:#9ca3af;font-style:italic;font-size:0.875rem;">${msg}</p>`;
+  return `<p style="color:var(--text-muted);font-style:italic;font-size:0.8rem;">${msg}</p>`;
 }
 
 // ── Keyboard shortcut ──────────────────────────────────────────────────────────

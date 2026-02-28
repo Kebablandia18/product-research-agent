@@ -3,191 +3,417 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MarketForge — AI Market Research</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50:  '#f0f4ff',
-              100: '#dce6ff',
-              200: '#b9ccff',
-              300: '#85a5ff',
-              400: '#4d73ff',
-              500: '#2246f5',
-              600: '#1230e8',
-              700: '#1026cc',
-              800: '#1322a5',
-              900: '#142282',
-            }
-          },
-          fontFamily: {
-            sans: ['Inter', 'system-ui', 'sans-serif']
-          }
-        }
-      }
-    }
-  </script>
+  <title>ARGUS — Amazon Product Intelligence</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" />
   <style>
-    .gradient-text {
-      background: linear-gradient(135deg, #2246f5 0%, #7c3aed 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    /* ── Argus Dark Theme ──────────────────────────────────────────── */
+    :root {
+      --bg-primary: #0b0e14;
+      --bg-secondary: #111621;
+      --bg-tertiary: #171d2b;
+      --bg-card: #131926;
+      --bg-card-hover: #1a2236;
+      --border-primary: #1e2740;
+      --border-accent: rgba(212,149,42,0.2);
+      --text-primary: #e2e6f0;
+      --text-secondary: #8892a8;
+      --text-muted: #555f78;
+      --accent: #d4952a;
+      --accent-bright: #f0b445;
+      --accent-dim: #a07020;
+      --accent-glow: rgba(212,149,42,0.13);
+      --success: #34d399;
+      --error: #f87171;
+      --warning: #fbbf24;
     }
-    .hero-bg {
-      background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(34,70,245,0.12) 0%, transparent 70%);
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
     }
-    .card-hover {
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    /* Subtle grid texture */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border-primary) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border-primary) 1px, transparent 1px);
+      background-size: 60px 60px;
+      opacity: 0.15;
+      pointer-events: none;
+      z-index: 0;
     }
-    .card-hover:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 20px 40px rgba(34,70,245,0.1);
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+    ::-webkit-scrollbar-thumb { background: var(--border-primary); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+    .mono { font-family: 'DM Mono', ui-monospace, monospace; }
+
+    /* ── Header ────────────────────────────────────────────────────── */
+    header {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(11,14,20,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-primary);
+    }
+    .header-inner {
+      max-width: 72rem; margin: 0 auto;
+      padding: 0 1.5rem; height: 3.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo { display: flex; align-items: center; gap: 0.625rem; }
+    .logo-icon {
+      width: 2rem; height: 2rem; border-radius: 0.5rem;
+      background: var(--accent);
+      box-shadow: 0 0 20px var(--accent-glow);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-text { font-weight: 700; font-size: 1.25rem; letter-spacing: -0.02em; }
+    .header-badge {
+      font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--accent);
+      background: var(--accent-glow);
+      border: 1px solid var(--border-accent);
+      padding: 0.25rem 0.75rem; border-radius: 9999px;
+    }
+
+    /* ── Hero ──────────────────────────────────────────────────────── */
+    #hero {
+      position: relative; z-index: 1;
+      min-height: calc(100vh - 3.5rem);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 3rem 1.5rem;
+    }
+    .hero-glow {
+      position: absolute; top: -20%; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 400px;
+      background: radial-gradient(ellipse, var(--accent-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-content { max-width: 40rem; width: 100%; text-align: center; position: relative; z-index: 1; }
+    .hero-title { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 0.75rem; }
+    .hero-title span { color: var(--accent-bright); }
+    .hero-subtitle {
+      color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase;
+      letter-spacing: 0.2em; margin-bottom: 2.5rem;
+    }
+
+    /* ── Search Card ──────────────────────────────────────────────── */
+    .search-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-primary);
+      border-radius: 1rem; padding: 1.5rem;
+      text-align: left; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .search-card:focus-within {
+      border-color: var(--border-accent);
+      box-shadow: 0 0 30px var(--accent-glow);
+    }
+    .search-label { font-size: 0.7rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem; }
+    .search-row { display: flex; align-items: center; gap: 0.75rem; }
+    .search-icon { color: var(--accent); flex-shrink: 0; }
+    textarea.search-input {
+      flex: 1; background: transparent; border: none; outline: none; resize: none;
+      color: var(--text-primary); font-family: 'Space Grotesk', system-ui, sans-serif;
+      font-size: 0.9375rem; line-height: 1.5;
+    }
+    textarea.search-input::placeholder { color: var(--text-muted); }
+    .search-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 1rem; }
+    .search-hint { font-size: 0.7rem; color: var(--text-muted); }
+
+    .btn-research {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: var(--accent); color: var(--bg-primary);
+      font-weight: 700; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 0.625rem 1.25rem; border-radius: 0.5rem; border: none; cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .btn-research:hover { opacity: 0.9; }
+    .btn-research:active { transform: scale(0.97); }
+    .btn-research:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    /* ── Example Chips ────────────────────────────────────────────── */
+    .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin-top: 1.5rem; }
+    .chip-label { font-size: 0.7rem; color: var(--text-muted); align-self: center; }
+    .chip {
+      font-size: 0.7rem; font-weight: 500; color: var(--text-secondary);
+      background: var(--bg-card); border: 1px solid var(--border-primary);
+      padding: 0.3rem 0.75rem; border-radius: 9999px; cursor: pointer;
+      transition: all 0.15s; border: 1px solid var(--border-primary);
+    }
+    .chip:hover { color: var(--accent-bright); border-color: var(--border-accent); background: rgba(212,149,42,0.06); }
+
+    /* ── Loading Overlay ──────────────────────────────────────────── */
+    #loadingState {
+      position: fixed; inset: 0; z-index: 40;
+      background: rgba(11,14,20,0.92); backdrop-filter: blur(8px);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem;
     }
     .spinner {
-      width: 40px; height: 40px;
-      border: 3px solid #e5e7eb;
-      border-top-color: #2246f5;
+      width: 36px; height: 36px;
+      border: 2px solid var(--border-primary);
+      border-top-color: var(--accent);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-msg { font-weight: 600; font-size: 1rem; color: var(--text-primary); }
+    .loading-sub { font-size: 0.8rem; color: var(--text-muted); }
+    .progress-track { width: 16rem; height: 3px; background: var(--bg-tertiary); border-radius: 2px; overflow: hidden; }
+    .progress-fill {
+      height: 100%; border-radius: 2px;
+      background: linear-gradient(90deg, var(--accent-dim), var(--accent-bright));
+      transition: width 1.2s ease;
+    }
+
+    /* ── Report Section ───────────────────────────────────────────── */
+    #reportSection { max-width: 72rem; margin: 0 auto; padding: 2rem 1.5rem 4rem; position: relative; z-index: 1; }
+
+    .report-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; }
+    .report-header-left .report-label {
+      font-size: 0.65rem; font-weight: 600; color: var(--accent); text-transform: uppercase;
+      letter-spacing: 0.15em; margin-bottom: 0.25rem;
+    }
+    .report-header-left h2 { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text-primary); }
+    .report-header-left .report-date { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; }
+    .report-actions { display: flex; gap: 0.5rem; }
+
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 0.375rem;
+      font-size: 0.75rem; font-weight: 500; color: var(--text-secondary);
+      background: var(--bg-card); border: 1px solid var(--border-primary);
+      padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-ghost:hover { color: var(--text-primary); border-color: var(--text-muted); }
+    .btn-ghost.accent { color: var(--accent); border-color: var(--border-accent); }
+    .btn-ghost.accent:hover { background: var(--accent-glow); }
+
+    /* ── Overview Cards ───────────────────────────────────────────── */
+    .overview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+    @media (max-width: 640px) { .overview-grid { grid-template-columns: repeat(2, 1fr); } }
+    .stat-card {
+      background: var(--bg-card); border: 1px solid var(--border-primary);
+      border-radius: 0.75rem; padding: 1.25rem;
+      transition: border-color 0.2s;
+    }
+    .stat-card:hover { border-color: var(--border-accent); }
+    .stat-icon { font-size: 1.25rem; margin-bottom: 0.5rem; }
+    .stat-label { font-size: 0.6rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.25rem; }
+    .stat-value { font-size: 0.9375rem; font-weight: 700; color: var(--text-primary); text-transform: capitalize; }
+
+    /* ── Tabs ──────────────────────────────────────────────────────── */
+    .tabs-bar {
+      display: flex; gap: 0.25rem; background: var(--bg-secondary);
+      border: 1px solid var(--border-primary); border-radius: 0.75rem;
+      padding: 0.25rem; margin-bottom: 2rem; flex-wrap: wrap;
+    }
+    .tab-btn {
+      flex: 1 1 auto; min-width: 80px;
+      padding: 0.5rem 0.75rem; font-size: 0.75rem; font-weight: 500;
+      color: var(--text-muted); border-radius: 0.5rem;
+      cursor: pointer; border: none; background: transparent;
+      transition: all 0.15s;
+    }
+    .tab-btn:hover { color: var(--text-secondary); background: var(--bg-tertiary); }
+    .tab-btn.active { color: var(--accent-bright); background: var(--bg-card); font-weight: 600; }
+
+    /* ── Content Cards ────────────────────────────────────────────── */
+    .content-card {
+      background: var(--bg-card); border: 1px solid var(--border-primary);
+      border-radius: 0.75rem; padding: 1.5rem;
+      transition: border-color 0.2s;
+    }
+    .content-card:hover { border-color: var(--border-accent); }
+    .section-title { font-size: 1.125rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem; }
+    .section-subtitle { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+    /* ── Badges ────────────────────────────────────────────────────── */
+    .badge {
+      display: inline-flex; align-items: center;
+      font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+      padding: 0.15rem 0.5rem; border-radius: 9999px;
+    }
+    .badge-high    { background: rgba(248,113,113,0.12); color: #f87171; }
+    .badge-medium  { background: rgba(251,191,36,0.12); color: #fbbf24; }
+    .badge-low     { background: rgba(52,211,153,0.12); color: #34d399; }
+    .badge-emerging  { background: rgba(96,165,250,0.12); color: #60a5fa; }
+    .badge-growing   { background: rgba(52,211,153,0.12); color: #34d399; }
+    .badge-mature    { background: rgba(148,163,184,0.12); color: #94a3b8; }
+    .badge-declining { background: rgba(248,113,113,0.12); color: #f87171; }
+
+    .pill {
+      display: inline-block; font-size: 0.65rem; font-weight: 500;
+      padding: 0.15rem 0.5rem; border-radius: 0.375rem;
+      background: rgba(212,149,42,0.1); color: var(--accent-bright);
+      border: 1px solid rgba(212,149,42,0.15);
+    }
+
+    /* ── Lists ─────────────────────────────────────────────────────── */
+    .check-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.375rem; }
+    .check-list li { display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.8125rem; color: var(--text-secondary); }
+    .check-list li svg { flex-shrink: 0; margin-top: 2px; }
+
+    /* ── SWOT Grid ─────────────────────────────────────────────────── */
+    .swot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .swot-quad { border-radius: 0.75rem; padding: 1.25rem; }
+    .swot-quad h4 { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+
+    /* ── Error Banner ──────────────────────────────────────────────── */
+    #errorBanner {
+      position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); z-index: 50;
+      background: rgba(248,113,113,0.15); border: 1px solid rgba(248,113,113,0.3);
+      color: var(--error); font-size: 0.8rem; font-weight: 500;
+      padding: 0.75rem 1.5rem; border-radius: 0.75rem;
+      display: flex; align-items: center; gap: 0.75rem;
+      backdrop-filter: blur(12px);
+    }
+
+    /* ── Utility ───────────────────────────────────────────────────── */
+    .hidden { display: none !important; }
     .fade-in { animation: fadeIn 0.4s ease forwards; }
     @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-    .progress-bar { transition: width 1.2s ease; }
-    .badge-high    { @apply bg-red-100 text-red-700; }
-    .badge-medium  { @apply bg-amber-100 text-amber-700; }
-    .badge-low     { @apply bg-green-100 text-green-700; }
-    .badge-emerging  { @apply bg-blue-100 text-blue-700; }
-    .badge-growing   { @apply bg-emerald-100 text-emerald-700; }
-    .badge-mature    { @apply bg-slate-100 text-slate-700; }
-    .badge-declining { @apply bg-red-100 text-red-700; }
-    .tab-btn.active { @apply bg-white text-brand-600 shadow-sm font-semibold; }
+
+    .divider { height: 1px; background: var(--border-primary); margin: 1rem 0; }
+
+    .amazon-badge {
+      display: inline-flex; align-items: center; gap: 0.25rem;
+      font-size: 0.6rem; font-weight: 600;
+      background: rgba(212,149,42,0.1); color: var(--accent);
+      padding: 0.15rem 0.5rem; border-radius: 9999px;
+      border: 1px solid var(--border-accent);
+      vertical-align: middle;
+    }
+
+    /* ── Competitor avatar ─────────────────────────────────────────── */
+    .avatar {
+      width: 2.25rem; height: 2.25rem; border-radius: 0.625rem; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-card-hover));
+      border: 1px solid var(--border-primary);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.875rem; color: var(--accent);
+    }
   </style>
 </head>
-<body class="bg-gray-50 font-sans text-gray-800 antialiased">
+<body>
 
   <!-- ── HEADER ── -->
-  <header class="border-b border-gray-200 bg-white/80 backdrop-blur sticky top-0 z-50">
-    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-violet-600 flex items-center justify-center">
-          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+  <header>
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style="color:#0b0e14">
+            <circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="9" cy="9" r="3" fill="currentColor"/>
           </svg>
         </div>
-        <span class="font-bold text-lg tracking-tight">MarketForge</span>
+        <span class="logo-text">ARGUS</span>
       </div>
-      <span class="text-xs font-medium text-brand-600 bg-brand-50 px-3 py-1 rounded-full border border-brand-200">
-        Amazon Data · Minimax AI
-      </span>
+      <span class="header-badge mono">Amazon Intelligence</span>
     </div>
   </header>
 
   <!-- ── HERO / INPUT ── -->
-  <section class="hero-bg min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center px-6 py-20" id="hero">
-    <div class="max-w-2xl w-full text-center space-y-6">
-      <div class="inline-flex items-center gap-2 text-xs font-semibold text-brand-600 bg-brand-50 border border-brand-200 rounded-full px-4 py-1.5 mb-2">
-        <span class="w-1.5 h-1.5 bg-brand-500 rounded-full animate-pulse"></span>
-        Amazon Marketplace Intelligence
-      </div>
-      <h1 class="text-5xl font-extrabold tracking-tight leading-tight">
-        Instant <span class="gradient-text">Amazon Research</span><br/>for Any Product
-      </h1>
-      <p class="text-gray-500 text-lg leading-relaxed">
-        Enter an Amazon product category or product idea and receive a comprehensive competitive intelligence report powered by live Amazon data.
-      </p>
+  <section id="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-content">
+      <p class="hero-subtitle mono">Amazon Product Intelligence</p>
+      <h1 class="hero-title">Research Any <span>Amazon Market</span> Instantly</h1>
 
-      <!-- Input card -->
-      <div class="bg-white border border-gray-200 rounded-2xl shadow-xl p-6 text-left space-y-4 mt-4">
-        <label class="block text-sm font-semibold text-gray-700">Describe the Amazon product you want to sell</label>
-        <textarea
-          id="productInput"
-          rows="3"
-          placeholder="e.g. wireless earbuds under $50, yoga mat for beginners, portable blender, LED desk lamp..."
-          class="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent transition"
-        ></textarea>
-        <div class="flex items-center justify-between pt-1">
-          <p class="text-xs text-gray-400">Be specific — include category, price range, or target customer for sharper insights.</p>
-          <button
-            id="analyzeBtn"
-            onclick="runResearch()"
-            class="inline-flex items-center gap-2 bg-gradient-to-r from-brand-500 to-violet-600 text-white font-semibold text-sm px-6 py-2.5 rounded-xl shadow-md hover:opacity-90 active:scale-95 transition disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
+      <!-- Search card -->
+      <div class="search-card">
+        <p class="search-label mono">Describe the product you want to sell</p>
+        <div class="search-row">
+          <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle cx="8.5" cy="8.5" r="6" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M13 13L17 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <textarea id="productInput" class="search-input" rows="2"
+            placeholder="e.g. wireless earbuds under $50, yoga mat for beginners, portable blender..."></textarea>
+        </div>
+        <div class="search-actions">
+          <span class="search-hint mono">Be specific for sharper insights</span>
+          <button id="analyzeBtn" class="btn-research mono" onclick="runResearch()">
+            <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+              <circle cx="8.5" cy="8.5" r="6" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M13 13L17 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
-            Analyze Market
+            RESEARCH
           </button>
         </div>
       </div>
 
       <!-- Example chips -->
-      <div class="flex flex-wrap justify-center gap-2 pt-2">
-        <span class="text-xs text-gray-400 self-center">Try:</span>
-        <button onclick="setExample('wireless earbuds under $30')" class="example-chip">Wireless Earbuds</button>
-        <button onclick="setExample('yoga mat for home workouts')" class="example-chip">Yoga Mat</button>
-        <button onclick="setExample('portable blender for protein shakes')" class="example-chip">Portable Blender</button>
-        <button onclick="setExample('LED desk lamp with USB charging')" class="example-chip">LED Desk Lamp</button>
+      <div class="chips">
+        <span class="chip-label mono">Try:</span>
+        <button class="chip mono" onclick="setExample('wireless earbuds under $30')">Wireless Earbuds</button>
+        <button class="chip mono" onclick="setExample('yoga mat for home workouts')">Yoga Mat</button>
+        <button class="chip mono" onclick="setExample('portable blender for protein shakes')">Portable Blender</button>
+        <button class="chip mono" onclick="setExample('LED desk lamp with USB charging')">LED Desk Lamp</button>
       </div>
     </div>
   </section>
 
   <!-- ── LOADING STATE ── -->
-  <div id="loadingState" class="hidden fixed inset-0 bg-white/80 backdrop-blur-sm z-40 flex flex-col items-center justify-center gap-6">
+  <div id="loadingState" class="hidden">
     <div class="spinner"></div>
-    <div class="text-center space-y-2">
-      <p class="font-semibold text-gray-800 text-lg" id="loadingMsg">Analyzing market...</p>
-      <p class="text-sm text-gray-500" id="loadingSubMsg">Identifying competitors and trends</p>
+    <div style="text-align:center">
+      <p class="loading-msg" id="loadingMsg">Analyzing market...</p>
+      <p class="loading-sub mono" id="loadingSubMsg">Identifying competitors and trends</p>
     </div>
-    <div class="w-64 bg-gray-200 rounded-full h-1.5">
-      <div id="progressBar" class="progress-bar bg-gradient-to-r from-brand-500 to-violet-500 h-1.5 rounded-full" style="width:0%"></div>
+    <div class="progress-track">
+      <div id="progressBar" class="progress-fill" style="width:0%"></div>
     </div>
   </div>
 
   <!-- ── REPORT SECTION ── -->
-  <section id="reportSection" class="hidden max-w-6xl mx-auto px-6 py-12 fade-in">
+  <section id="reportSection" class="hidden fade-in">
 
     <!-- Report Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-      <div>
-        <p class="text-xs font-semibold text-brand-600 uppercase tracking-wider mb-1">Market Research Report</p>
-        <h2 class="text-3xl font-bold text-gray-900" id="reportTitle">—</h2>
-        <p class="text-sm text-gray-500 mt-1" id="reportDate">—</p>
+    <div class="report-header">
+      <div class="report-header-left">
+        <p class="report-label mono">Market Research Report</p>
+        <h2 id="reportTitle">—</h2>
+        <p class="report-date mono" id="reportDate">—</p>
       </div>
-      <div class="flex gap-3">
-        <button onclick="scrollToTop()" class="inline-flex items-center gap-1.5 text-sm text-gray-600 border border-gray-200 bg-white px-4 py-2 rounded-xl hover:bg-gray-50 transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12"/>
-          </svg>
+      <div class="report-actions">
+        <button class="btn-ghost" onclick="scrollToTop()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12"/></svg>
           New Search
         </button>
-        <button onclick="exportJSON()" class="inline-flex items-center gap-1.5 text-sm text-brand-600 border border-brand-200 bg-brand-50 px-4 py-2 rounded-xl hover:bg-brand-100 transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-          </svg>
+        <button class="btn-ghost accent" onclick="exportJSON()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
           Export JSON
         </button>
       </div>
     </div>
 
     <!-- Market Overview Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8" id="overviewCards"></div>
+    <div class="overview-grid" id="overviewCards"></div>
+
+    <!-- Overview Summary -->
+    <div id="overviewSummaryWrap"></div>
 
     <!-- Tabs -->
-    <div class="bg-gray-100 rounded-2xl p-1 flex gap-1 mb-8 flex-wrap" id="reportTabs">
-      <button class="tab-btn active" data-tab="competitors" onclick="switchTab('competitors')">Competitors</button>
-      <button class="tab-btn" data-tab="segments" onclick="switchTab('segments')">Segments</button>
-      <button class="tab-btn" data-tab="trends" onclick="switchTab('trends')">Trends</button>
-      <button class="tab-btn" data-tab="gaps" onclick="switchTab('gaps')">Opportunities</button>
-      <button class="tab-btn" data-tab="swot" onclick="switchTab('swot')">SWOT</button>
-      <button class="tab-btn" data-tab="strategy" onclick="switchTab('strategy')">Strategy</button>
+    <div class="tabs-bar" id="reportTabs">
+      <button class="tab-btn active mono" data-tab="competitors" onclick="switchTab('competitors')">Competitors</button>
+      <button class="tab-btn mono" data-tab="segments" onclick="switchTab('segments')">Segments</button>
+      <button class="tab-btn mono" data-tab="trends" onclick="switchTab('trends')">Trends</button>
+      <button class="tab-btn mono" data-tab="gaps" onclick="switchTab('gaps')">Opportunities</button>
+      <button class="tab-btn mono" data-tab="swot" onclick="switchTab('swot')">SWOT</button>
+      <button class="tab-btn mono" data-tab="strategy" onclick="switchTab('strategy')">Strategy</button>
     </div>
 
     <!-- Tab Panels -->
@@ -201,43 +427,11 @@
   </section>
 
   <!-- ── ERROR BANNER ── -->
-  <div id="errorBanner" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-red-600 text-white text-sm font-medium px-6 py-3 rounded-2xl shadow-xl z-50 flex items-center gap-3">
-    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12A9 9 0 113 12a9 9 0 0118 0z"/>
-    </svg>
+  <div id="errorBanner" class="hidden">
+    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12A9 9 0 113 12a9 9 0 0118 0z"/></svg>
     <span id="errorMsg">An error occurred.</span>
-    <button onclick="hideError()" class="ml-2 opacity-70 hover:opacity-100">✕</button>
+    <button onclick="hideError()" style="background:none;border:none;color:var(--error);cursor:pointer;opacity:0.7;font-size:0.9rem;">✕</button>
   </div>
-
-  <style>
-    .tab-btn {
-      flex: 1 1 auto;
-      min-width: 90px;
-      padding: 0.5rem 1rem;
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: #6b7280;
-      border-radius: 0.875rem;
-      transition: all 0.15s ease;
-      cursor: pointer;
-      border: none;
-      background: transparent;
-    }
-    .tab-btn:hover { background: rgba(255,255,255,0.6); color: #111827; }
-    .tab-btn.active { background: white; color: #2246f5; font-weight: 600; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-    .example-chip {
-      font-size: 0.75rem;
-      font-weight: 500;
-      color: #4b5563;
-      background: white;
-      border: 1px solid #e5e7eb;
-      padding: 0.35rem 0.85rem;
-      border-radius: 9999px;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .example-chip:hover { border-color: #2246f5; color: #2246f5; background: #f0f4ff; }
-  </style>
 
   <script src="app.js"></script>
 </body>
