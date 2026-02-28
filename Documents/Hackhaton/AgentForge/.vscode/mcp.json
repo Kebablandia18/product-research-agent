@@ -1,0 +1,15 @@
+{
+	"servers": {
+		"the-web-mcp": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"@brightdata/mcp"
+			],
+			"env": {
+				"API_TOKEN": "$input:api-token"
+			}
+		}
+	},
+	"inputs": []
+}
